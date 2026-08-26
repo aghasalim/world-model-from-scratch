@@ -19,14 +19,14 @@ C = {"recon (Dreamer style)": "#1a9850", "no-recon (MuZero style)": "#2166ac",
 def fig_open_loop(out: Path) -> Path:
     t = pd.read_csv(RESULTS / "open-loop.csv")
     fig, (a, b) = plt.subplots(1, 2, figsize=(13.5, 5.3))
-    for mode in C:
+    for mode, colour in C.items():
         s = t[t["mode"] == mode]
         if s.empty:
             continue
         g = s.groupby("step")["reward_mae"]
-        a.plot(g.median().index, g.median().values, color=C[mode], label=mode, linewidth=2)
+        a.plot(g.median().index, g.median().values, color=colour, label=mode, linewidth=2)
         a.fill_between(g.median().index, g.min().values, g.max().values,
-                       color=C[mode], alpha=0.15, linewidth=0)
+                       color=colour, alpha=0.15, linewidth=0)
     a.set_xlabel("open loop step (no observations after this point)")
     a.set_ylabel("reward prediction MAE")
     a.set_title("Rolling the prior forward with no observations\nmedian and range over 3 seeds")
@@ -34,15 +34,15 @@ def fig_open_loop(out: Path) -> Path:
     a.legend(frameon=False, fontsize=9)
 
     early = t[t["step"].isin([1, 2, 3, 5, 8])]
-    for mode in C:
+    for mode, colour in C.items():
         s = early[early["mode"] == mode]
         if s.empty:
             continue
         g = s.groupby("step")["reward_mae"]
-        b.plot(g.median().index, g.median().values, marker="o", color=C[mode],
+        b.plot(g.median().index, g.median().values, marker="o", color=colour,
                label=mode, linewidth=2)
         b.fill_between(g.median().index, g.min().values, g.max().values,
-                       color=C[mode], alpha=0.15, linewidth=0)
+                       color=colour, alpha=0.15, linewidth=0)
     b.set_xlabel("open loop step")
     b.set_ylabel("reward prediction MAE")
     b.set_title("Short horizon, where the bands separate\n"
@@ -58,14 +58,14 @@ def fig_open_loop(out: Path) -> Path:
 def fig_learning(out: Path) -> Path:
     t = pd.read_csv(RESULTS / "learning-curves.csv")
     fig, ax = plt.subplots(figsize=(10.5, 5.6))
-    for mode in C:
+    for mode, colour in C.items():
         s = t[t["mode"] == mode]
         if s.empty:
             continue
         g = s.groupby("env_steps")["return"]
-        ax.plot(g.median().index, g.median().values, color=C[mode], label=mode, linewidth=1.9)
+        ax.plot(g.median().index, g.median().values, color=colour, label=mode, linewidth=1.9)
         ax.fill_between(g.median().index, g.min().values, g.max().values,
-                        color=C[mode], alpha=0.13, linewidth=0)
+                        color=colour, alpha=0.13, linewidth=0)
     ax.set_xscale("log")
     ax.set_xlabel("environment steps")
     ax.set_ylabel("episode return")
