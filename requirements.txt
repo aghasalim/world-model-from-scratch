@@ -1,0 +1,10 @@
+# CPU only. The environment is implemented here rather than pulled from gym, so
+# there is no simulator dependency and the whole thing runs on a laptop.
+torch
+numpy
+matplotlib
+pandas
+
+# dev
+pytest
+ruff

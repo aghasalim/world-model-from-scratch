@@ -1,0 +1,26 @@
+{
+ "seeds": [
+  0,
+  1,
+  2
+ ],
+ "iters": 60,
+ "envs": 16,
+ "horizon": 60,
+ "buffer": 400,
+ "batch": 32,
+ "wm_updates": 25,
+ "actor_updates": 8,
+ "imag_horizon": 40,
+ "wm_lr": 0.0003,
+ "actor_lr": 0.001,
+ "mf_lr": 0.0003,
+ "mf_iters": 400,
+ "mf_eval_every": 10,
+ "eval_every": 5,
+ "explore": 0.3,
+ "kl_balance": 0.8,
+ "wall_clock_s": 574.4863558330107,
+ "torch": "2.13.0",
+ "device": "cpu"
+}
