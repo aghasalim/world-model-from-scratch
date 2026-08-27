@@ -167,9 +167,9 @@ tests/           22 tests
 - **Laskin, Srinivas, Abbeel. CURL: Contrastive Unsupervised Representations for Reinforcement Learning. ICML 2020.** [arXiv:2004.04136](https://arxiv.org/abs/2004.04136) The contrastive arm.
 - **Kaelbling, Littman, Cassandra. Planning and Acting in Partially Observable Stochastic Domains. AI 1998.** Why hiding velocity changes the problem rather than just making it harder.
 
-## Conventions
+## Methodology
 
-Shared rules in [`CONVENTIONS.md`](CONVENTIONS.md). Rule 14, negative results
+The rules this follows are in [`METHODOLOGY.md`](METHODOLOGY.md). Rule 14, negative results
 stay in, is most of why this file reads the way it does.
 
 ## Author
