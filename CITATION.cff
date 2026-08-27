@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: If you use this work, please cite it as below.
+title: "World Models from scratch: RSSM and learning in imagination"
+abstract: "A recurrent state space model and an actor critic trained entirely in imagination on a partially observable control task, with a representation ablation."
+type: software
+authors:
+  - family-names: Mustafazada
+    given-names: Aghasalim
+    orcid: "https://orcid.org/0009-0001-8746-4582"
+    affiliation: "Howest University of Applied Sciences"
+repository-code: "https://github.com/aghasalim/world-model-from-scratch"
+url: "https://aghasalim.github.io/"
+license: MIT
+date-released: "2026-08-27"
+version: "1.0.0"
+keywords:
+  - world models
+  - RSSM
+  - model-based reinforcement learning
+  - POMDP
