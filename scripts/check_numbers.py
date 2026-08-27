@@ -15,6 +15,11 @@ def main() -> int:
     ol = list(csv.DictReader((ROOT / "results" / "open-loop.csv").open()))
     summ = list(csv.DictReader((ROOT / "results" / "summary.csv").open()))
     body = (ROOT / "README.md").read_text()
+    # Detail moved out of the README lives in notes/METHODS.md. A figure quoted
+    # there is still a quoted figure and still has to match its source.
+    _methods = ROOT / "notes" / "METHODS.md"
+    if _methods.exists():
+        body += "\n" + _methods.read_text()
     claims, failures = [], []
 
     by = collections.defaultdict(lambda: collections.defaultdict(list))
