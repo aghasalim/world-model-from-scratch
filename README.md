@@ -57,8 +57,9 @@ the best no-recon seed, so the bands do not overlap. The same holds at k=5:
 
 **The advantage is gone by ten steps.** At k=10 recon spans 0.0699 to 0.1203 and
 no-recon spans 0.0853 to 0.1883, which overlap, and by k=40 the medians are
-0.2910 and 0.2884, indistinguishable. Both have degraded to roughly seven times
-their one step error by then.
+0.2910 and 0.2884, indistinguishable. Recon has degraded to 7.2 times its one
+step error by then and no-recon to 4.9 times, because no-recon started worse at
+one step and had less room to fall.
 
 So the reconstruction signal buys accuracy where the model is still anchored to
 recent observations, and buys nothing once the trajectory has drifted. That is a
@@ -83,9 +84,10 @@ space would probably treat it more kindly.
 
 ![model fitting](results/model-fit.png)
 
-Reward prediction loss falls by roughly fifteen times over training, and the KL
-between posterior and prior rises as the posterior becomes informative, which is
-the expected shape.
+Comparing the median first iteration loss to the median last one, reward
+prediction loss falls by 23 times for recon, 23 times for no-recon and 35 times
+for contrastive. The KL between posterior and prior rises as the posterior
+becomes informative, which is the expected shape.
 
 ## What did not work
 | method | return | range over seeds | env steps |
