@@ -101,7 +101,7 @@ python -m pytest tests/ -q
 ```
 
 ```bash
-python -m experiments.main --seeds 0 1 2 --iters 60 --imag-horizon 40 --actor-lr 1e-3
+python -m experiments.main --seeds 0 1 2 --iters 60 --imag-horizon 40 --actor-lr 1e-3 --eval-every 5
 ```
 
 ```bash
