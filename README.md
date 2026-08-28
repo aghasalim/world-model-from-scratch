@@ -65,6 +65,14 @@ recent observations, and buys nothing once the trajectory has drifted. That is a
 narrower claim than "Dreamer's decoder is worth it", and it is the one this
 experiment supports.
 
+![imagined rollout against the true rollout](results/dream-vs-real.gif)
+
+Both pendulums start from the same twenty observed steps and are driven by the
+same action sequence, and after step 20 the model is given nothing. It keeps the
+shape of the swing and loses the timing. This is the reconstruction model at
+seed 0, showing the episode whose open loop error is the median of the 128 the
+numbers above are averaged over.
+
 **Contrastive is worst at every horizon**, which surprised me. Its InfoNCE term
 only asks the latent to identify which observation in the batch it corresponds
 to, and on a two dimensional observation living on the unit circle that is an
@@ -108,8 +116,12 @@ python -m experiments.main --seeds 0 1 2 --iters 60 --imag-horizon 40 --actor-lr
 python -m bench.figures
 ```
 
-The sweep takes about ten minutes on an M4 CPU and writes `results/*.csv`.
-Figures read those files and never re-run an experiment.
+The sweep takes about ten minutes on an M4 CPU and writes `results/*.csv`. The
+three static figures read those files and never re-run an experiment. The
+animation is the one exception, because a drifting rollout is not something a
+summary file can hold: it retrains the seed 0 world model, which takes about a
+minute, and refuses to write itself unless its open loop error still matches the
+committed `open-loop.csv` exactly.
 
 ## Layout
 
