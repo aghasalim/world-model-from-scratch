@@ -88,7 +88,15 @@ between posterior and prior rises as the posterior becomes informative, which is
 the expected shape.
 
 ## What did not work
-| method | return | range over seeds | env steps | |---|---:|---|---:| | recon (Dreamer style) | −38.13 | −40.9 to −36.8 | 57,600 | | no-recon (MuZero style) | −39.17 | −40.4 to −35.9 | 57,600 | | contrastive | −40.92 | −42.7 to −40.6 | 57,600 | | model-free (recurrent PG) | −40.66 | −43.2 to −38.1 | 57,600 | | model-free, run out to 384,000 steps | −35.08 | −40.0 to −34.9 | 384,000 | A random policy scores about −38.
+| method | return | range over seeds | env steps |
+|---|---:|---|---:|
+| recon (Dreamer style) | −38.13 | −40.9 to −36.8 | 57,600 |
+| no-recon (MuZero style) | −39.17 | −40.4 to −35.9 | 57,600 |
+| contrastive | −40.92 | −42.7 to −40.6 | 57,600 |
+| model-free (recurrent PG) | −40.66 | −43.2 to −38.1 | 57,600 |
+| model-free, run out to 384,000 steps | −35.08 | −40.0 to −34.9 | 384,000 |
+
+A random policy scores about −38.
 
 ![learning curves](results/learning-curves.png)
 

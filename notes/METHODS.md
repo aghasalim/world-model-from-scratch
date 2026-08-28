@@ -6,7 +6,7 @@ Long form detail moved out of the README.
 ## What did not work
 
 
-![learning curves](results/learning-curves.png)
+![learning curves](../results/learning-curves.png)
 
 | method | return | range over seeds | env steps |
 |---|---:|---|---:|
