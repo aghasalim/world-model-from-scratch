@@ -90,6 +90,7 @@ for contrastive. The KL between posterior and prior rises as the posterior
 becomes informative, which is the expected shape.
 
 ## What did not work
+
 | method | return | range over seeds | env steps |
 |---|---:|---|---:|
 | recon (Dreamer style) | −38.13 | −40.9 to −36.8 | 57,600 |
@@ -98,15 +99,33 @@ becomes informative, which is the expected shape.
 | model-free (recurrent PG) | −40.66 | −43.2 to −38.1 | 57,600 |
 | model-free, run out to 384,000 steps | −35.08 | −40.0 to −34.9 | 384,000 |
 
-A random policy scores about −38.
+A random policy scores about −38. Nothing in the table clears that by a margin
+worth claiming, so the sample efficiency result this repo was meant to show does
+not reproduce: the best world model at −38.13 against the model-free baseline at
+−40.66 is a gap far smaller than the spread across three seeds. Run out to
+384,000 steps that same baseline reaches −35.08, better than every final in the
+table above. Tuning did move things without fixing them. Raising the imagination
+horizon from 15 to 40 took the best run from −40.1 to −30.1, and then the runs
+oscillate rather than hold: one reaches −30.6 and falls back to −39.4.
 
 ![learning curves](results/learning-curves.png)
 
 Full detail in [notes/METHODS.md](notes/METHODS.md#what-did-not-work).
+
 ## What I got wrong
-**I set the imagination horizon by copying a number rather than by thinking about the task.** Fifteen steps is standard in Dreamer papers on control suites with different timesteps.
+
+**I set the imagination horizon by copying a number rather than by thinking about
+the task.** Fifteen steps is standard in Dreamer papers on control suites with
+different timesteps. At dt=0.05 that is 0.75 seconds against a swing up that
+needs several, so the agent was being asked to plan over a window in which the
+correct action looks actively bad. Three debugging passes went by before I
+converted 15 steps into seconds.
+
+I also skipped the target critic because DreamerV2 describes it as a
+stabilisation detail. Putting it back did not fix the oscillation either.
 
 Full detail in [notes/METHODS.md](notes/METHODS.md#what-i-got-wrong).
+
 ## Running it
 
 ```bash
