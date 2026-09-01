@@ -23,3 +23,41 @@ jobs:
         run: python -m pytest tests/ -q
       - name: Check quoted numbers against results/
         run: python scripts/check_numbers.py
+
+  verify:
+    # Recompute the published numbers in languages that share no code with the
+    # repository, then prove the checks can fail by breaking a results file and
+    # requiring rejection.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install R
+        run: |
+          command -v Rscript >/dev/null 2>&1 || \
+            sudo apt-get install -y --no-install-recommends r-base-core
+      - name: Toolchains present
+        run: |
+          for t in sqlite3 cc go cargo Rscript node ruby; do
+            printf '%-10s %s\n' "$t" "$(command -v $t || echo MISSING)"
+          done
+      - name: Cross language verification
+        run: ./verify/verify.sh
+      - name: A corrupted results file must be rejected
+        run: |
+          python3 - <<'PY'
+          import pathlib
+          p = pathlib.Path("results/open-loop.csv")
+          s = p.read_bytes()
+          old = b"recon (Dreamer style),0.04025869071483612,0,1"
+          assert old in s, "the row the self test corrupts is no longer there"
+          p.write_bytes(s.replace(old, b"recon (Dreamer style),0.09025869071483612,0,1"))
+          PY
+          if ./verify/verify.sh; then
+            echo "verify.sh passed on a corrupted open-loop.csv, so it is checking nothing"
+            exit 1
+          fi
+          echo "rejected, as it should be"
+      - name: And must pass again once restored
+        run: |
+          git checkout -- results/open-loop.csv
+          ./verify/verify.sh

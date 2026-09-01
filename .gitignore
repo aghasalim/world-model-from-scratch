@@ -10,5 +10,9 @@ dist/
 *.egg-info/
 *.ncu-rep
 
+# Build products of the cross language checks. The sources in verify/ are
+# committed; nothing they compile to is.
+verify/pendulum/target/
+
 # results/ is deliberately NOT ignored -- benchmark CSVs are committed so the
 # README tables stay reproducible.

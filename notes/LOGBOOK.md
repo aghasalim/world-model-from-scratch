@@ -1,5 +1,10 @@
 # Logbook
 
+## 2026-09-01, the random baseline I had been reading everything against was wrong
+**Tried:** reimplementing the environment in Rust so a second implementation would have to agree with `wm/envs.py` before I trusted either. See `verify/pendulum`.
+**Measured:** a uniform random policy over 200,000 episodes returns -36.87, standard error 0.02. PyTorch over the same number of episodes gives -36.85. I had been quoting -38 everywhere, from the earlier entry below onwards.
+**Concluded:** the figure line, the README and `notes/METHODS.md` all moved to -36.9. It makes the negative result stronger rather than weaker: at 57,600 environment steps every world model here is below random, not level with it. The number had never been measured on its own, only eyeballed off a learning curve, and nothing in the repository recomputed it. That is exactly the gap `verify/` exists to close.
+
 ## 2026-08-26, the imagination horizon was set by copying a number
 **Tried:** first full run. The world model fit well (reward loss 0.0713 down to 0.0047, about fifteen times) but the policy did not move: return stayed between -38 and -40 for sixty iterations, which is where a random policy sits.
 **Measured:** raising the imagination horizon from 15 to 40 took the best run from -40.1 to -30.1. Raising it further to 50 was worse again.

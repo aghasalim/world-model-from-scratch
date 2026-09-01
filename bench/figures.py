@@ -42,7 +42,7 @@ C = {RECON: PALETTE[0], NORECON: PALETTE[3],
 
 DT = 0.05          # seconds per step, from wm/envs.py
 CONTEXT = 20       # filtered steps before the observations are cut off
-RANDOM_RETURN = -38.0   # the random policy baseline the README quotes
+RANDOM_RETURN = -36.9   # measured over 200,000 episodes, see verify/pendulum
 
 
 def _seeds(ax, frame, x, y, colour, label, marker=None, window=1, alpha=0.25):
@@ -111,7 +111,7 @@ def fig_learning(out: Path) -> Path:
     ax.set_xscale("log")
     ax.set_xlabel("environment steps (log scale)")
     ax.set_ylabel("episode return (sum of 60 step rewards)")
-    ax.text(ax.get_xlim()[0] * 1.15, RANDOM_RETURN + 0.15, "random policy, about -38",
+    ax.text(ax.get_xlim()[0] * 1.15, RANDOM_RETURN + 0.15, "random policy, about -36.9",
             ha="left", va="bottom", fontsize=9, color="#6a6a6a",
             bbox={"facecolor": "white", "edgecolor": "none", "pad": 1.5})
     titled(ax, "Nothing here reliably beats acting at random",

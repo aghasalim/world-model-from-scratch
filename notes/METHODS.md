@@ -13,12 +13,14 @@ Long form detail moved out of the README.
 | recon (Dreamer style) | −38.13 | −40.9 to −36.8 | 57,600 |
 | no-recon (MuZero style) | −39.17 | −40.4 to −35.9 | 57,600 |
 | contrastive | −40.92 | −42.7 to −40.6 | 57,600 |
-| model-free (recurrent PG) | −40.66 | −43.2 to −38.1 | 57,600 |
+| model-free (recurrent PG) | −40.66 | −43.2 to −38.1 | 48,960 |
 | model-free, run out to 384,000 steps | −35.08 | −40.0 to −34.9 | 384,000 |
 
-A random policy scores about −38. Nothing here clears it by a margin worth
-claiming, and the sample efficiency result the repo was supposed to demonstrate
-does not reproduce.
+A random policy scores about −36.9, measured over 200,000 episodes by
+`verify/pendulum`. Nothing here clears it at 57,600 steps, so the sample
+efficiency result the repo was supposed to demonstrate does not reproduce. The
+model-free row is its nearest evaluation to that budget, at 48,960 steps; the
+next one up, 58,560 steps, is −35.89.
 
 I tuned this rather than giving up on the first failure. The imagination horizon
 mattered most: at 15 steps, which is 0.75 seconds of simulated time, the policy
