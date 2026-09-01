@@ -73,8 +73,9 @@ static void load(Blocks *bs, const char *path)
         if (fscanf(f, "%63s %d %d", name, &rows, &cols) != 3) break;
         if (bs->n >= MAX_BLOCKS) { fprintf(stderr, "too many blocks\n"); exit(2); }
         Block *b = &bs->b[bs->n++];
-        strncpy(b->name, name, NAME_LEN - 1);
-        b->name[NAME_LEN - 1] = '\0';
+        /* fscanf already bounded name at NAME_LEN - 1; snprintf rather than
+         * strncpy so gcc can see the result is always terminated. */
+        snprintf(b->name, sizeof b->name, "%s", name);
         b->rows = rows; b->cols = cols;
         b->v = malloc(sizeof(double) * (size_t)rows * cols);
         if (!b->v) { fprintf(stderr, "out of memory\n"); exit(2); }
