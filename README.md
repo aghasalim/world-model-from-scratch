@@ -13,7 +13,9 @@ Two honest halves. **The world model works and the representation question gets 
 real answer.** The agent that learns inside it does not: it never reliably solves
 the task, and I say so rather than reporting the seed where it looked best.
 
-Everything runs on a laptop CPU in about ten minutes.
+Everything runs on a laptop CPU in about ten minutes. Every number published
+here is recomputed from the committed results by independent implementations in
+`verify/`, and CI fails if any of them disagree.
 
 ## The task
 
@@ -173,49 +175,9 @@ wm/agent.py      actor critic in imagination, lambda returns, target critic
 wm/modelfree.py  recurrent policy gradient baseline, same architecture
 wm/buffer.py     sequence replay
 experiments/     the sweep and the open loop measurement
-verify/          the same numbers recomputed in seven other languages
+verify/          the same numbers recomputed independently
 tests/           22 tests
 ```
-
-## Everything here is computed twice
-
-Every number this repository publishes came out of one PyTorch program. The
-figures read the CSVs that program wrote. `scripts/check_numbers.py` compares the
-README against those same CSVs, in Python, using the same statistics library. So
-nothing ever disagreed with the original, and a mistake in it would have been
-copied faithfully by everything downstream rather than caught.
-
-`verify/` recomputes the published claims in seven languages that share no code
-with the repository and no code with each other. `./verify/verify.sh` runs them
-all, skips any whose toolchain is missing, and exits non-zero if any two
-disagree. CI runs it, then corrupts a results file and requires the run to fail,
-because a check that cannot fail is decoration.
-
-| language | what it recomputes, and from what | measured agreement |
-|---|---|---|
-| Python | `scripts/check_numbers.py`, the original: quoted figures against `results/` | the numbers everything else is checked against |
-| SQL | both published tables: medians, spans and per seed values from `open-loop.csv` and `summary.csv` | 36 figures recomputed, all 36 found in the documents |
-| C | the dynamics step itself, GRU cell and prior and reward head, against a PyTorch reference rollout | largest disagreement 3.9e-08 over 160 open loop steps, tolerance 2e-05 |
-| Go | structure of every file in `results/`, row counts predicted from `run-meta.json`, `summary.csv` against the end of each curve, and the documented command against the run | 240, 360 and 12 rows as predicted; 12 of 12 finals equal to the last bit |
-| R | exact permutation inference on the ablation, all 20 splits of the 6 seeds enumerated | separation at k=1 and k=5 at p=0.20, which R also shows is the floor for 3 seeds against 3 |
-| Rust | the environment reimplemented: the PyTorch trajectory, then 200,000 random policy episodes and a 4,000,000 state ambiguity sweep | trajectory within 4.0e-05; mean return −36.87 with standard error 0.02 against PyTorch's −36.85 |
-| JavaScript | the claims written in words: the loss reduction factors, and the step budget the model-free row is quoted at | 23.09, 22.61 and 34.64 times, rounding to the 23, 23 and 35 the README states |
-| Ruby | prose against the source it describes: drift multiples, the baseline in `bench/figures.py`, `DT` in `wm/envs.py`, the episode count in `experiments/main.py` | 7.23 and 4.89 times, printed as 7.2 and 4.9; all three constants agree |
-
-The C and Rust checks read reference outputs written by `verify/export_golden.py`,
-which is the only part of `verify/` that imports the repository. Everything else
-reads committed files and nothing else.
-
-**It found two things wrong.** The random policy baseline was quoted as about −38
-everywhere, including the dashed line every learning curve is read against. It
-had never been measured on its own. 200,000 episodes in Rust give −36.87 and
-200,000 in PyTorch give −36.85, so it is now −36.9, and the negative result got
-stronger rather than weaker: at 57,600 environment steps every world model here
-sits below random rather than level with it. The second is smaller. The
-model-free row of the return table was labelled 57,600 environment steps, but the
-model-free arm is only evaluated every ten iterations and its nearest evaluation
-is 48,960. The row says 48,960 now, and the README says what the next evaluation
-up gives, because picking the one below flatters the world models.
 
 ## Sources
 
