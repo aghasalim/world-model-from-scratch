@@ -126,6 +126,22 @@ oscillate rather than hold: one reaches −30.6 and falls back to −39.4.
 
 Full detail in [notes/METHODS.md](notes/METHODS.md#what-did-not-work).
 
+## What the checks caught
+
+Two things were wrong. The random policy baseline was quoted as about −38
+everywhere, including the dashed line every learning curve is read against. It
+had never been measured on its own. Two independent reimplementations of the
+environment, 200,000 episodes each, give −36.87 and −36.85, so it is now
+−36.9, and the negative result got stronger rather than weaker: at 57,600
+environment steps every world model here sits below random rather than level
+with it.
+
+The second is smaller. The model-free row of the return table was labelled
+57,600 environment steps, but the model-free arm is only evaluated every ten
+iterations and its nearest evaluation is 48,960. The row says 48,960 now, and
+the README says what the next evaluation up gives, because picking the one below
+flatters the world models.
+
 ## What I got wrong
 
 **I set the imagination horizon by copying a number rather than by thinking about
