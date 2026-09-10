@@ -184,7 +184,7 @@ summary file can hold: it retrains the seed 0 world model, which takes about a
 minute, and refuses to write itself unless its open loop error still matches the
 committed `open-loop.csv` exactly.
 
-[notes/WHAT-RAN.md](notes/WHAT-RAN.md) takes that command apart flag by flag and
+[notes/FLAGS.md](notes/FLAGS.md) takes that command apart flag by flag and
 says what each arm cost.
 
 ## What is where
