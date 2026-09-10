@@ -11,9 +11,11 @@ needs to reconstruct observations at all.
 
 Two honest halves. **The world model works and the representation question gets a
 real answer.** The agent that learns inside it does not: it never reliably solves
-the task, and I say so rather than reporting the seed where it looked best.
+the task, and I say so rather than reporting the seed where it looked best. Keeping the
+half that failed is [`METHODOLOGY.md`](METHODOLOGY.md) rule 14, and it is most of
+why this file reads the way it does.
 
-Everything runs on a laptop CPU in about ten minutes. Every number published
+No GPU anywhere: the whole sweep is ten minutes of laptop CPU. Every number published
 here is recomputed from the committed results by independent implementations in
 `verify/`, and CI fails if any of them disagree.
 
@@ -124,7 +126,7 @@ oscillate rather than hold: one reaches −30.6 and falls back to −39.4.
 
 ![learning curves](results/learning-curves.png)
 
-Full detail in [notes/METHODS.md](notes/METHODS.md#what-did-not-work).
+Longer version in [notes/METHODS.md](notes/METHODS.md#what-did-not-work).
 
 ## What the checks caught
 
@@ -154,7 +156,7 @@ converted 15 steps into seconds.
 I also skipped the target critic because DreamerV2 describes it as a
 stabilisation detail. Putting it back did not fix the oscillation either.
 
-Full detail in [notes/METHODS.md](notes/METHODS.md#what-i-got-wrong).
+Longer version in [notes/METHODS.md](notes/METHODS.md#what-i-got-wrong).
 
 ## Running it
 
@@ -182,7 +184,7 @@ summary file can hold: it retrains the seed 0 world model, which takes about a
 minute, and refuses to write itself unless its open loop error still matches the
 committed `open-loop.csv` exactly.
 
-## Layout
+## What is where
 
 ```
 wm/envs.py       the POMDP pendulum, written directly, no simulator dependency
@@ -195,7 +197,7 @@ verify/          the same numbers recomputed independently
 tests/           22 tests
 ```
 
-## Sources
+## Reading
 
 - **Hafner, Lillicrap, Fischer, Villegas, Ha, Lee, Davidson. Learning Latent Dynamics for Planning from Pixels. ICML 2019.** [arXiv:1811.04551](https://arxiv.org/abs/1811.04551) PlaNet, and the RSSM's split of the latent into deterministic and stochastic parts.
 - **Hafner, Lillicrap, Ba, Norouzi. Dream to Control: Learning Behaviors by Latent Imagination. ICLR 2020.** [arXiv:1912.01603](https://arxiv.org/abs/1912.01603) Dreamer: backpropagating the actor through imagined trajectories.
@@ -203,26 +205,6 @@ tests/           22 tests
 - **Schrittwieser, Antonoglou, Hubert et al. Mastering Atari, Go, Chess and Shogi by Planning with a Learned Model. Nature 2020.** [arXiv:1911.08265](https://arxiv.org/abs/1911.08265) MuZero: the no-reconstruction position this ablation tests.
 - **Laskin, Srinivas, Abbeel. CURL: Contrastive Unsupervised Representations for Reinforcement Learning. ICML 2020.** [arXiv:2004.04136](https://arxiv.org/abs/2004.04136) The contrastive arm.
 - **Kaelbling, Littman, Cassandra. Planning and Acting in Partially Observable Stochastic Domains. AI 1998.** Why hiding velocity changes the problem rather than just making it harder.
-
-## Methodology
-
-The rules this follows are in [`METHODOLOGY.md`](METHODOLOGY.md). Rule 14, negative results
-stay in, is most of why this file reads the way it does.
-
-## Author
-
-Aghasalim Mustafazada, third year AI student at Howest, Belgium.
-
-<p align="center">
-  <a href="https://github.com/aghasalim">
-    <img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" alt="github"></a>
-  <a href="https://www.kaggle.com/aghasalimmustafazada">
-    <img src="https://img.shields.io/badge/Kaggle-20BEFF?style=for-the-badge&logo=kaggle&logoColor=white" alt="kaggle"></a>
-  <a href="https://linkedin.com/in/mustafazada">
-    <img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" alt="linkedin"></a>
-  <a href="https://orcid.org/0009-0001-8746-4582">
-    <img src="https://img.shields.io/badge/ORCID-A6CE39?style=for-the-badge&logo=orcid&logoColor=white" alt="orcid"></a>
-</p>
 
 ## License
 
