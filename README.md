@@ -12,7 +12,7 @@ needs to reconstruct observations at all.
 Two honest halves. **The world model works and the representation question gets a
 real answer.** The agent that learns inside it does not: it never reliably solves
 the task, and I say so rather than reporting the seed where it looked best. Keeping the
-half that failed is [`METHODOLOGY.md`](METHODOLOGY.md) rule 14, and it is most of
+half that failed is [`METHODOLOGY.md`](METHODOLOGY.md) rule 12, and it is most of
 why this file reads the way it does.
 
 No GPU anywhere: the whole sweep is ten minutes of laptop CPU. Every number published
