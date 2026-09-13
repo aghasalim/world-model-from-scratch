@@ -164,22 +164,24 @@ def train_model_free(args, seed):
 
 
 def main() -> int:
+    # The defaults are the settings that produced results/. Four of them
+    # started as the Dreamer papers' values and moved; the logbook has which.
     ap = argparse.ArgumentParser()
     ap.add_argument("--seeds", nargs="+", type=int, default=[0, 1, 2])
-    ap.add_argument("--iters", type=int, default=40)
+    ap.add_argument("--iters", type=int, default=60)
     ap.add_argument("--envs", type=int, default=16)
     ap.add_argument("--horizon", type=int, default=60)
     ap.add_argument("--buffer", type=int, default=400)
     ap.add_argument("--batch", type=int, default=32)
     ap.add_argument("--wm-updates", type=int, default=25)
     ap.add_argument("--actor-updates", type=int, default=8)
-    ap.add_argument("--imag-horizon", type=int, default=15)
+    ap.add_argument("--imag-horizon", type=int, default=40)
     ap.add_argument("--wm-lr", type=float, default=3e-4)
-    ap.add_argument("--actor-lr", type=float, default=8e-5)
+    ap.add_argument("--actor-lr", type=float, default=1e-3)
     ap.add_argument("--mf-lr", type=float, default=3e-4)
     ap.add_argument("--mf-iters", type=int, default=400)
     ap.add_argument("--mf-eval-every", type=int, default=10)
-    ap.add_argument("--eval-every", type=int, default=4)
+    ap.add_argument("--eval-every", type=int, default=5)
     ap.add_argument("--explore", type=float, default=0.3)
     ap.add_argument("--kl-balance", type=float, default=0.8)
     args = ap.parse_args()

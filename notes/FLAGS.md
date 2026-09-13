@@ -18,14 +18,18 @@ Four flags override a default in `experiments/main.py`:
 
 | flag | default | this run | default at |
 |---|---:|---:|---|
-| `--iters` | 40 | 60 | `main.py:169` |
-| `--imag-horizon` | 15 | 40 | `main.py:176` |
-| `--actor-lr` | 8e-5 | 1e-3 | `main.py:178` |
-| `--eval-every` | 4 | 5 | `main.py:182` |
+| `--iters` | 60, was 40 | 60 | `main.py:171` |
+| `--imag-horizon` | 40, was 15 | 40 | `main.py:178` |
+| `--actor-lr` | 1e-3, was 8e-5 | 1e-3 | `main.py:180` |
+| `--eval-every` | 5, was 4 | 5 | `main.py:184` |
 
 Only the horizon change is explained anywhere: `notes/LOGBOOK.md`,
-2026-08-26, 15 steps is 0.75 s of pendulum time at dt 0.05. The other three
-have no logbook entry. `--actor-lr` also sets the critic's learning rate
+2026-08-26, 15 steps is 0.75 s of pendulum time at dt 0.05. Sixty iterations
+was the length of the first full run, so 40 never ran. The learning rate and
+the evaluation cadence have no entry recording what chose them, and the
+logbook for 2026-09-13 says so rather than inventing one. On that date the
+defaults in `main.py` were brought level with the run, so the bare command
+reproduces `results/`. `--actor-lr` also sets the critic's learning rate
 (`main.py:92`).
 
 The rest ran at their defaults, which `run-meta.json` records too:

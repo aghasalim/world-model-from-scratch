@@ -1,5 +1,10 @@
 # Logbook
 
+## 2026-09-13, the defaults did not reproduce the published run
+**Tried:** ran `python -m experiments.main` with no flags and compared against `results/run-meta.json`.
+**Measured:** four settings differed. `--iters` 40 against 60, `--imag-horizon` 15 against 40, `--actor-lr` 8e-5 against 1e-3, `--eval-every` 4 against 5. The README command carried all four overrides and the Go check held it to `run-meta.json`, so the published numbers were never in doubt, but the bare command produced a different experiment.
+**Concluded:** the defaults were the Dreamer papers' numbers, and the run was not. The horizon change has its own entry above, with the measurement. Sixty iterations was the length of the first full run, so 40 never ran at all. The learning rate and the evaluation cadence I cannot account for: whatever run or reasoning moved 8e-5 to 1e-3 was not written down at the time, and I am not going to reconstruct one now. The defaults are now the values that produced the results, so the command in the README and the bare command agree. The lesson is the same one as the horizon entry, from the other side: a number copied from a paper should not survive as the default once the run has moved off it.
+
 ## 2026-09-01, the random baseline I had been reading everything against was wrong
 **Tried:** reimplementing the environment in Rust so a second implementation would have to agree with `wm/envs.py` before I trusted either. See `verify/pendulum`.
 **Measured:** a uniform random policy over 200,000 episodes returns -36.87, standard error 0.02. PyTorch over the same number of episodes gives -36.85. I had been quoting -38 everywhere, from the earlier entry below onwards.
