@@ -9,7 +9,7 @@ An RSSM built from the Dreamer papers, an actor critic trained entirely in
 imagination, and the representation ablation that asks whether a world model
 needs to reconstruct observations at all.
 
-Two honest halves. **The world model works and the representation question gets a
+Two halves. **The world model works and the representation question gets a
 real answer.** The agent that learns inside it does not, at the budget it was built
 for: at 57,600 environment steps none of the world models beats a random policy.
 Given the 384,000 steps the model-free baseline got, all three do, and all three
@@ -56,13 +56,13 @@ median over 3 seeds:
 | 20 | 0.2230 | 0.3029 | 0.2954 |
 | 40 | 0.2910 | 0.2884 | 0.3648 |
 
-**Reconstruction helps, and at short horizons the result is clean.** At one step
+Reconstruction helps, and at short horizons the result is clean. At one step
 the three seeds for reconstruction are 0.0360, 0.0403 and 0.0439, and the three
 for no-recon are 0.0535, 0.0589 and 0.0889. The worst reconstruction seed beats
 the best no-recon seed, so the bands do not overlap. The same holds at k=5:
 0.0578 worst against 0.0674 best.
 
-**The advantage is gone by ten steps.** At k=10 recon spans 0.0699 to 0.1203 and
+The advantage is gone by ten steps. At k=10 recon spans 0.0699 to 0.1203 and
 no-recon spans 0.0853 to 0.1883, which overlap, and by k=40 the medians are
 0.2910 and 0.2884, indistinguishable. Recon has degraded to 7.2 times its one
 step error by then and no-recon to 4.9 times, because no-recon started worse at
@@ -164,8 +164,8 @@ Two things were wrong. The random policy baseline was quoted as about −38
 everywhere, including the dashed line every learning curve is read against. It
 had never been measured on its own. Two independent reimplementations of the
 environment, 200,000 episodes each, give −36.87 and −36.85, so it is now
-−36.9, and the negative result got stronger rather than weaker: at 57,600
-environment steps every world model here sits below random rather than level
+−36.9, and the negative result got stronger, not weaker: at 57,600
+environment steps every world model here sits below random, not level
 with it.
 
 The second is smaller. The model-free row of the return table was labelled
@@ -176,8 +176,8 @@ flatters the world models.
 
 ## What I got wrong
 
-**I set the imagination horizon by copying a number rather than by thinking about
-the task.** Fifteen steps is standard in Dreamer papers on control suites with
+I set the imagination horizon by copying a number, not by thinking about
+the task. Fifteen steps is standard in Dreamer papers on control suites with
 different timesteps. At dt=0.05 that is 0.75 seconds against a swing up that
 needs several, so the agent was being asked to plan over a window in which the
 correct action looks actively bad. Three debugging passes went by before I
