@@ -27,8 +27,7 @@ here is recomputed from the committed results by independent implementations in
 A pendulum swing up where the agent observes only `cos(theta)` and `sin(theta)`.
 Angular velocity is hidden.
 
-That is the whole reason the environment is written by hand instead of pulled
-from gym. With velocity observed this is a plain MDP and a feedforward policy
+That is the whole reason the environment is written by hand, not pulled from gym. With velocity observed this is a plain MDP and a feedforward policy
 solves it, so nothing would test whether the model carries state. Hiding it makes
 the task a POMDP: two states with the same angle and opposite velocity produce
 an identical observation, and the only way to tell them apart is to remember
@@ -108,8 +107,7 @@ becomes informative, which is the expected shape.
 
 A random policy scores about −36.9, measured over 200,000 episodes by
 `verify/pendulum`. That is better than every world model in the table, so the
-sample efficiency result this repo was meant to show does not reproduce, and the
-honest version is blunter than the one I first wrote: at 57,600 environment steps
+sample efficiency result this repo was meant to show does not reproduce, and the accurate version is blunter than the one I first wrote: at 57,600 environment steps
 none of the three world models has learned anything worth having. The best of
 them at −38.13 sits below random, the model-free baseline at −40.66 sits further
 below, and the gap between those two is far smaller than the spread across three
@@ -124,8 +122,7 @@ the choice of method does, which is the same conclusion from the other side.
 Run out to 384,000 steps that same baseline reaches −35.08, better than every
 final in the table above and the only entry that beats a random policy at all.
 Tuning did move things without fixing them. Raising the imagination
-horizon from 15 to 40 took the best run from −40.1 to −30.1, and then the runs
-oscillate rather than hold: one reaches −30.6 and falls back to −39.4.
+horizon from 15 to 40 took the best run from −40.1 to −30.1, and then the runs oscillate: one reaches −30.6 and falls back to −39.4.
 
 ### Given the same 384,000 steps
 
@@ -237,7 +234,7 @@ tests/           22 tests
 - **Hafner, Lillicrap, Norouzi, Ba. Mastering Atari with Discrete World Models. ICLR 2021.** [arXiv:2010.02193](https://arxiv.org/abs/2010.02193) DreamerV2. KL balancing, lambda returns and the target critic all come from here.
 - **Schrittwieser, Antonoglou, Hubert et al. Mastering Atari, Go, Chess and Shogi by Planning with a Learned Model. Nature 2020.** [arXiv:1911.08265](https://arxiv.org/abs/1911.08265) MuZero: the no-reconstruction position this ablation tests.
 - **Laskin, Srinivas, Abbeel. CURL: Contrastive Unsupervised Representations for Reinforcement Learning. ICML 2020.** [arXiv:2004.04136](https://arxiv.org/abs/2004.04136) The contrastive arm.
-- **Kaelbling, Littman, Cassandra. Planning and Acting in Partially Observable Stochastic Domains. AI 1998.** Why hiding velocity changes the problem rather than just making it harder.
+- **Kaelbling, Littman, Cassandra. Planning and Acting in Partially Observable Stochastic Domains. AI 1998.** Why hiding velocity changes the problem, not just its difficulty.
 
 ## License
 
