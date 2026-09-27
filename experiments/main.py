@@ -184,14 +184,21 @@ def main() -> int:
     ap.add_argument("--eval-every", type=int, default=5)
     ap.add_argument("--explore", type=float, default=0.3)
     ap.add_argument("--kl-balance", type=float, default=0.8)
+    ap.add_argument("--modes", nargs="+", choices=list(MODES), default=list(MODES),
+                    help="world model variants to train")
+    ap.add_argument("--no-model-free", action="store_true",
+                    help="skip the model free baseline")
+    ap.add_argument("--out", default=str(RESULTS), help="directory for the CSVs")
     args = ap.parse_args()
 
-    RESULTS.mkdir(exist_ok=True)
+    out = Path(args.out)
+    out.mkdir(parents=True, exist_ok=True)
     curves, openloop, summary = [], [], []
     started = time.perf_counter()
 
     for seed in args.seeds:
-        for mode, kw in MODES.items():
+        for mode in args.modes:
+            kw = MODES[mode]
             rssm, _actor, curve, wall, steps = train_world_model(mode, kw, args, seed)
             curves += curve
             final = curve[-1]["return"]
@@ -203,6 +210,8 @@ def main() -> int:
             print(f"  seed {seed}  {mode:26} return {final:+7.2f}  "
                   f"{steps} env steps  {wall:5.0f}s")
 
+        if args.no_model_free:
+            continue
         curve, wall, steps = train_model_free(args, seed)
         curves += curve
         summary.append({"mode": "model-free (recurrent PG)", "seed": seed,
@@ -213,13 +222,13 @@ def main() -> int:
 
     for fname, rows in (("learning-curves.csv", curves), ("open-loop.csv", openloop),
                         ("summary.csv", summary)):
-        p = RESULTS / fname
+        p = out / fname
         with p.open("w", newline="") as fh:
             w = csv.DictWriter(fh, fieldnames=sorted({k for r in rows for k in r}))
             w.writeheader()
             w.writerows(rows)
-        print(f"wrote {p.relative_to(ROOT)} ({len(rows)} rows)")
-    (RESULTS / "run-meta.json").write_text(json.dumps({
+        print(f"wrote {p} ({len(rows)} rows)")
+    (out / "run-meta.json").write_text(json.dumps({
         **vars(args), "wall_clock_s": time.perf_counter() - started,
         "torch": torch.__version__, "device": "cpu"}, indent=1))
     print(f"total {time.perf_counter() - started:.1f}s")
