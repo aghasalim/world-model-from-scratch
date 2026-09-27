@@ -27,7 +27,7 @@ here is recomputed from the committed results by independent implementations in
 A pendulum swing up where the agent observes only `cos(theta)` and `sin(theta)`.
 Angular velocity is hidden.
 
-That is the whole reason the environment is written by hand, not pulled from gym. With velocity observed this is a plain MDP and a feedforward policy
+That is the whole reason the environment is written by hand. With velocity observed this is a plain MDP and a feedforward policy
 solves it, so nothing would test whether the model carries state. Hiding it makes
 the task a POMDP: two states with the same angle and opposite velocity produce
 an identical observation, and the only way to tell them apart is to remember
@@ -161,9 +161,8 @@ Two things were wrong. The random policy baseline was quoted as about −38
 everywhere, including the dashed line every learning curve is read against. It
 had never been measured on its own. Two independent reimplementations of the
 environment, 200,000 episodes each, give −36.87 and −36.85, so it is now
-−36.9, and the negative result got stronger, not weaker: at 57,600
-environment steps every world model here sits below random, not level
-with it.
+−36.9, and the negative result got stronger: at 57,600
+environment steps every world model here sits below random.
 
 The second is smaller. The model-free row of the return table was labelled
 57,600 environment steps, but the model-free arm is only evaluated every ten
