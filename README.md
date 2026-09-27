@@ -4,6 +4,7 @@
 [![python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
 [![license](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![results](https://img.shields.io/badge/results-reproducible-1a9850.svg)](results/)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23003689.svg)](https://doi.org/10.5281/zenodo.23003689)
 
 An RSSM built from the Dreamer papers, an actor critic trained entirely in
 imagination, and the representation ablation that asks whether a world model
