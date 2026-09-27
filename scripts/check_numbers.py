@@ -53,6 +53,23 @@ def main() -> int:
         claims.append((f"return-min {mode}", f"{abs(min(v)):.1f}"))
         claims.append((f"return-max {mode}", f"{abs(max(v)):.1f}"))
 
+    # The 384,000 step reruns: every seed's final return and the median, as
+    # printed in the table, plus the best return seen during training.
+    long_path = ROOT / "results" / "long-summary.csv"
+    if long_path.exists():
+        long = collections.defaultdict(list)
+        for r in csv.DictReader(long_path.open()):
+            long[r["mode"]].append((int(r["seed"]), float(r["final_return"])))
+        for mode, v in long.items():
+            finals = [x for _, x in sorted(v)]
+            row = f"| {mode} | " + " | ".join(f"\u2212{abs(x):.2f}" for x in finals) \
+                + f" | \u2212{abs(statistics.median(finals)):.2f} |"
+            if row not in body:
+                failures.append(f"384k row for {mode} should read {row}")
+            claims.append((f"384k {mode}", f"{abs(statistics.median(finals)):.2f}"))
+        curves = [float(r["return"]) for r in csv.DictReader((ROOT / "results" / "long-curves.csv").open())]
+        claims.append(("384k best during training", f"{abs(max(curves)):.2f}"))
+
     for label, text in claims:
         if not re.search(r"(?<![\d.])" + re.escape(text) + r"(?!\d)", body):
             failures.append(f"{label} should read {text}, not found")

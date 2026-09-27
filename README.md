@@ -10,12 +10,15 @@ imagination, and the representation ablation that asks whether a world model
 needs to reconstruct observations at all.
 
 Two honest halves. **The world model works and the representation question gets a
-real answer.** The agent that learns inside it does not: it never reliably solves
-the task, and I say so rather than reporting the seed where it looked best. Keeping the
+real answer.** The agent that learns inside it does not, at the budget it was built
+for: at 57,600 environment steps none of the world models beats a random policy.
+Given the 384,000 steps the model-free baseline got, all three do, and all three
+beat that baseline, but none of them solves the task and one run collapses. Keeping the
 half that failed is [`METHODOLOGY.md`](METHODOLOGY.md) rule 12, and it is most of
 why this file reads the way it does.
 
-No GPU anywhere: the whole sweep is ten minutes of laptop CPU. Every number published
+No GPU anywhere: the main sweep is ten minutes of laptop CPU, and the 384,000 step
+runs another 23 minutes. Every number published
 here is recomputed from the committed results by independent implementations in
 `verify/`, and CI fails if any of them disagree.
 
@@ -123,6 +126,33 @@ final in the table above and the only entry that beats a random policy at all.
 Tuning did move things without fixing them. Raising the imagination
 horizon from 15 to 40 took the best run from −40.1 to −30.1, and then the runs
 oscillate rather than hold: one reaches −30.6 and falls back to −39.4.
+
+### Given the same 384,000 steps
+
+The comparison above is not fair to the world models. The model-free baseline
+was run out to 384,000 environment steps and they were stopped at 57,600, so
+they were each rerun for 400 iterations, 384,000 steps, with every other setting
+unchanged ([`results/long-summary.csv`](results/long-summary.csv),
+[`results/long-curves.csv`](results/long-curves.csv)).
+
+| method, at 384,000 steps | seed 0 | seed 1 | seed 2 | median |
+|---|---:|---:|---:|---:|
+| recon (Dreamer style) | −28.54 | −30.81 | −31.75 | −30.81 |
+| no-recon (MuZero style) | −31.15 | −20.51 | −26.06 | −26.06 |
+| contrastive | −32.26 | −32.33 | −40.91 | −32.33 |
+| model-free (recurrent PG) | −40.03 | −34.94 | −35.08 | −35.08 |
+
+With the same experience every world model beats the random policy's −36.9 and
+the model-free baseline, except one contrastive run, which goes flat at −40.91 by
+about 25,000 steps and never moves again. No-recon is best on two of three seeds and has the best
+single run, −20.51. So the sample efficiency result does exist, it just needs
+more steps than the budget this repo was designed around.
+
+Two things keep me from calling this a win. None of these returns is close to
+holding the pendulum up, and the curves still wander: the best return any
+world model hit during training was −16.82, on a seed that finished at −26.06.
+And per environment step is not per unit of compute. A 384,000 step world model
+run took about 420 s here, the model-free one about 7 s.
 
 ![learning curves](results/learning-curves.png)
 
