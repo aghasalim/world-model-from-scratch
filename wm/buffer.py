@@ -19,6 +19,7 @@ class SequenceBuffer:
         self.ptr = 0
 
     def add(self, obs, act, rew):
+        """Append a batch of sequences one by one, overwriting the oldest once full."""
         b = obs.shape[0]
         for i in range(b):
             self.obs[self.ptr] = obs[i]
@@ -28,5 +29,6 @@ class SequenceBuffer:
             self.n = min(self.n + 1, self.capacity)
 
     def sample(self, batch: int, generator=None):
+        """Uniform sample with replacement from the filled part. Raises if empty."""
         idx = torch.randint(0, self.n, (batch,), generator=generator)
         return self.obs[idx], self.act[idx], self.rew[idx]
