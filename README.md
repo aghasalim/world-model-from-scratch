@@ -19,7 +19,7 @@ half that failed is [`METHODOLOGY.md`](METHODOLOGY.md) rule 12, and it is most o
 why this file reads the way it does.
 
 No GPU anywhere: the main sweep is ten minutes of laptop CPU, and the 384,000 step
-runs another 23 minutes. Every number published
+runs take another 23 minutes. Every number published
 here is recomputed from the committed results by independent implementations in
 `verify/`, and CI fails if any of them disagree.
 
