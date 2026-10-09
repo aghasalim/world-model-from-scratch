@@ -1,5 +1,10 @@
 # Logbook
 
+## 2026-10-10, the lambda return bootstrapped the last step from the wrong state
+**Tried:** checking `lambda_return` by hand at lam=0, where it should be one step TD.
+**Measured:** with rewards 1, 2, 3, values 10, 20, 30 and gamma 0.5 the last return came out 18, r plus gamma times the value of the same state. It should be 30, the value itself, because there is no next state to bootstrap from. The fix also changes the two older lambda tests, which had been written against the old behaviour.
+**Concluded:** every published training number came from the old code, so `results/` and the README tables need a full rerun (the 60 iteration sweep and the 400 iteration one) before this can be merged. I have not rerun them yet.
+
 ## 2026-09-13, the defaults did not reproduce the published run
 **Tried:** ran `python -m experiments.main` with no flags and compared against `results/run-meta.json`.
 **Measured:** four settings differed. `--iters` 40 against 60, `--imag-horizon` 15 against 40, `--actor-lr` 8e-5 against 1e-3, `--eval-every` 4 against 5. The README command carried all four overrides and the Go check held it to `run-meta.json`, so the published numbers were never in doubt, but the bare command produced a different experiment.

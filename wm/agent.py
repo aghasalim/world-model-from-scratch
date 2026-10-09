@@ -45,13 +45,19 @@ class Critic(nn.Module):
 
 
 def lambda_return(rewards, values, gamma=0.99, lam=0.95):
-    """DreamerV2 style lambda returns over an imagined trajectory."""
+    """DreamerV2 style lambda returns over an imagined trajectory.
+
+    R_t = r_t + gamma * ((1 - lam) * v_{t+1} + lam * R_{t+1}). The trajectory
+    has no state after T-1, so the last step is the bootstrap itself,
+    R_{T-1} = v_{T-1}. It used to bootstrap step T-1 from v_{T-1}, the value of
+    the same state rather than the next one.
+    """
     T = rewards.shape[1]
     out = torch.zeros_like(rewards)
     last = values[:, -1]
-    for t in reversed(range(T)):
-        boot = values[:, t + 1] if t + 1 < T else values[:, -1]
-        last = rewards[:, t] + gamma * ((1 - lam) * boot + lam * last)
+    out[:, -1] = last
+    for t in reversed(range(T - 1)):
+        last = rewards[:, t] + gamma * ((1 - lam) * values[:, t + 1] + lam * last)
         out[:, t] = last
     return out
 
