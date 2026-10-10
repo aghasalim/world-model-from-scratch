@@ -6,41 +6,43 @@
 [![results](https://img.shields.io/badge/results-reproducible-1a9850.svg)](results/)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23003689.svg)](https://doi.org/10.5281/zenodo.23003689)
 
-An RSSM built from the Dreamer papers, an actor critic trained entirely in
-imagination, and the representation ablation that asks whether a world model
-needs to reconstruct observations at all.
+I built an RSSM from the Dreamer papers and trained an actor critic entirely in
+imagination. I also ran an ablation to see if a world model needs to reconstruct
+observations at all.
 
-Two halves. **The world model works and the representation question gets a
-real answer.** The agent that learns inside it does not, at the budget it was built
-for: at 57,600 environment steps none of the world models beats a random policy.
-Given the 384,000 steps the model-free baseline got, all three do, and all three
-beat that baseline, but none of them solves the task and one run collapses. Keeping the
-half that failed is [`METHODOLOGY.md`](METHODOLOGY.md) rule 12, and it is most of
-why this file reads the way it does.
+Half of this worked. The world model learns, and I got a real answer on the
+representation question. The agent trained inside it didn't work at the budget I
+planned for. At 57,600 environment steps none of the world models beats a random
+policy. With the 384,000 steps the model-free baseline got, all three beat random
+and the baseline too. Still, none of them solves the task, and one run collapses.
+I kept the half that failed because of [`METHODOLOGY.md`](METHODOLOGY.md) rule 12,
+and that's a big part of why this README looks the way it does.
 
-No GPU anywhere: the main sweep is ten minutes of laptop CPU, and the 384,000 step
-runs take another 23 minutes. Every number published
-here is recomputed from the committed results by independent implementations in
+I didn't use a GPU. The main sweep takes ten minutes on my laptop CPU, and the
+384,000 step runs take another 23 minutes. Every number published
+here is recomputed from the committed results by separate implementations in
 `verify/`, and CI fails if any of them disagree.
 
 ## The task
 
-A pendulum swing up where the agent observes only `cos(theta)` and `sin(theta)`.
-Angular velocity is hidden.
+It's a pendulum swing up where the agent only sees `cos(theta)` and `sin(theta)`.
+The angular velocity is hidden.
 
-That is the whole reason the environment is written by hand. With velocity observed this is a plain MDP and a feedforward policy
-solves it, so nothing would test whether the model carries state. Hiding it makes
-the task a POMDP: two states with the same angle and opposite velocity produce
-an identical observation, and the only way to tell them apart is to remember
-where the pendulum was. That is exactly what the recurrent state of an RSSM is
-for, and there is a test asserting the ambiguity exists.
+That's why I wrote the environment by hand. If the agent could see velocity, it
+would be a plain MDP that a feedforward policy can solve, and nothing would test
+whether the model keeps track of state. Hiding velocity makes it a POMDP. Two
+states with the same angle and opposite velocity give the same observation, and
+the only way to tell them apart is to remember where the pendulum was. That's
+what the recurrent state of an RSSM is for. There's also a test that checks the
+ambiguity is really there.
 
 ## The representation ablation
 
-Dreamer reconstructs observations and pays capacity for it. MuZero style models
-reconstruct nothing and predict only what is needed for control. Contrastive
-methods sit between. All three are implemented behind one flag, trained
-identically, and measured by how far they can roll forward with no observations.
+Dreamer reconstructs observations and spends capacity on that. MuZero style
+models don't reconstruct anything and only predict what control needs.
+Contrastive methods are somewhere in between. I put all three behind one flag,
+trained them the same way, and measured how far each can roll forward without
+any observations.
 
 ![open loop prediction error](results/open-loop.png)
 
@@ -56,45 +58,45 @@ median over 3 seeds:
 | 20 | 0.2230 | 0.3029 | 0.2954 |
 | 40 | 0.2910 | 0.2884 | 0.3648 |
 
-Reconstruction helps, and at short horizons the result is clean. At one step
-the three seeds for reconstruction are 0.0360, 0.0403 and 0.0439, and the three
-for no-recon are 0.0535, 0.0589 and 0.0889. The worst reconstruction seed beats
-the best no-recon seed, so the bands do not overlap. The same holds at k=5:
-0.0578 worst against 0.0674 best.
+Reconstruction helps, and at short horizons it's clear. At one step the three
+reconstruction seeds are 0.0360, 0.0403 and 0.0439. The three no-recon seeds are
+0.0535, 0.0589 and 0.0889. Even the worst reconstruction seed beats the best
+no-recon seed, so the bands don't overlap. It's the same at k=5, with 0.0578
+worst against 0.0674 best.
 
-The advantage is gone by ten steps. At k=10 recon spans 0.0699 to 0.1203 and
-no-recon spans 0.0853 to 0.1883, which overlap, and by k=40 the medians are
-0.2910 and 0.2884, indistinguishable. Recon has degraded to 7.2 times its one
-step error by then and no-recon to 4.9 times, because no-recon started worse at
-one step and had less room to fall.
+By ten steps the advantage is gone. At k=10 recon spans 0.0699 to 0.1203 and
+no-recon spans 0.0853 to 0.1883, so they overlap. By k=40 the medians are 0.2910
+and 0.2884, which I can't tell apart. Recon has degraded to 7.2 times its one
+step error by then and no-recon to 4.9 times. No-recon started worse at one step, so
+it had less room to get worse.
 
-So the reconstruction signal buys accuracy where the model is still anchored to
-recent observations, and buys nothing once the trajectory has drifted. That is a
-narrower claim than "Dreamer's decoder is worth it", and it is the one this
+So reconstruction makes the model more accurate while it's still close to recent
+observations, and stops helping once the trajectory has drifted. That's a
+narrower claim than "Dreamer's decoder is worth it", but it's the one my
 experiment supports.
 
 ![imagined rollout against the true rollout](results/dream-vs-real.gif)
 
-Both pendulums start from the same twenty observed steps and are driven by the
-same action sequence, and after step 20 the model is given nothing. It keeps the
-shape of the swing and loses the timing. This is the reconstruction model at
-seed 0, showing the episode whose open loop error is the median of the 128 the
-numbers above are averaged over.
+Both pendulums start from the same twenty observed steps and get the same action
+sequence. After step 20 the model gets nothing. It keeps the shape of the swing
+but loses the timing. This is the reconstruction model at seed 0, on the episode
+whose open loop error is the median of the 128 the numbers above are averaged
+over.
 
-**Contrastive is worst at every horizon**, which surprised me. Its InfoNCE term
-only asks the latent to identify which observation in the batch it corresponds
-to, and on a two dimensional observation living on the unit circle that is an
-easy discrimination that does not require encoding much. A richer observation
-space would probably treat it more kindly.
+Contrastive was the worst at every horizon, and that surprised me. Its InfoNCE
+term only asks the latent to pick out which observation in the batch it belongs
+to. With a two dimensional observation on the unit circle that's an easy task,
+so the latent doesn't have to encode much. I'd guess it would do better with a
+richer observation space.
 
 ## The model itself learns
 
 ![model fitting](results/model-fit.png)
 
-Comparing the median first iteration loss to the median last one, reward
-prediction loss falls by 23 times for recon, 23 times for no-recon and 35 times
-for contrastive. The KL between posterior and prior rises as the posterior
-becomes informative, which is the expected shape.
+From the median first iteration loss to the median last one, reward prediction
+loss falls by 23 times for recon, 23 times for no-recon and 35 times for
+contrastive. The KL between posterior and prior goes up as the posterior starts
+carrying information, which is what I expected.
 
 ## What did not work
 
@@ -107,30 +109,28 @@ becomes informative, which is the expected shape.
 | model-free, run out to 384,000 steps | −35.08 | −40.0 to −34.9 | 384,000 |
 
 A random policy scores about −36.9, measured over 200,000 episodes by
-`verify/pendulum`. That is better than every world model in the table, so the
-sample efficiency result this repo was meant to show does not reproduce, and the accurate version is blunter than the one I first wrote: at 57,600 environment steps
-none of the three world models has learned anything worth having. The best of
-them at −38.13 sits below random, the model-free baseline at −40.66 sits further
-below, and the gap between those two is far smaller than the spread across three
-seeds.
+`verify/pendulum`. That beats every world model in the table, so the sample
+efficiency result I set out to show doesn't reproduce. Put plainly, at 57,600 environment steps
+none of the three world models has learned anything useful. The best one, at
+−38.13, is below random. The model-free baseline at −40.66 is further below. The
+gap between those two is much smaller than the spread across three seeds.
 
 The model-free arm is evaluated every ten iterations and never lands exactly on
-57,600 steps, so its row above is the nearest evaluation below that, at 48,960.
-The next one up, at 58,560 steps, has a median of −35.89, better than every world
-model final here. Which evaluation you read off moves the comparison further than
-the choice of method does, which is the same conclusion from the other side.
+57,600 steps. Its row above is the nearest evaluation below that, at 48,960. The
+next one up, at 58,560 steps, has a median of −35.89, which beats every world
+model final here. Picking a different evaluation point moves the comparison more
+than picking a different method does, so it points to the same conclusion.
 
-Run out to 384,000 steps that same baseline reaches −35.08, better than every
-final in the table above and the only entry that beats a random policy at all.
-Tuning did move things without fixing them. Raising the imagination
+When I ran that baseline out to 384,000 steps it reached −35.08. That's better
+than every final in the table above, and it's the only entry that beats a random
+policy at all. Tuning changed things without fixing them. Raising the imagination
 horizon from 15 to 40 took the best run from −40.1 to −30.1, and then the runs oscillate: one reaches −30.6 and falls back to −39.4.
 
 ### Given the same 384,000 steps
 
-The comparison above is not fair to the world models. The model-free baseline
-was run out to 384,000 environment steps and they were stopped at 57,600, so
-they were each rerun for 400 iterations, 384,000 steps, with every other setting
-unchanged ([`results/long-summary.csv`](results/long-summary.csv),
+The comparison above isn't fair to the world models. I ran the model-free
+baseline out to 384,000 environment steps but stopped them at 57,600. So I reran
+each one for 400 iterations, 384,000 steps, and left every other setting the same ([`results/long-summary.csv`](results/long-summary.csv),
 [`results/long-curves.csv`](results/long-curves.csv)).
 
 | method, at 384,000 steps | seed 0 | seed 1 | seed 2 | median |
@@ -140,17 +140,17 @@ unchanged ([`results/long-summary.csv`](results/long-summary.csv),
 | contrastive | −32.26 | −32.33 | −40.91 | −32.33 |
 | model-free (recurrent PG) | −40.03 | −34.94 | −35.08 | −35.08 |
 
-With the same experience every world model beats the random policy's −36.9 and
-the model-free baseline, except one contrastive run, which goes flat at −40.91 by
-about 25,000 steps and never moves again. No-recon is best on two of three seeds and has the best
-single run, −20.51. So the sample efficiency result does exist, it just needs
-more steps than the budget this repo was designed around.
+With the same experience, every world model beats the random policy's −36.9 and
+the model-free baseline. The one exception is a contrastive run that goes flat at
+−40.91 by about 25,000 steps and never moves again. No-recon is best on two of three seeds and has the best
+single run, −20.51. So the sample efficiency result is real. It just needs more
+steps than the budget I originally planned for.
 
-Two things keep me from calling this a win. None of these returns is close to
-holding the pendulum up, and the curves still wander: the best return any
+I still wouldn't call this a win, for two reasons. None of these returns comes
+close to holding the pendulum up, and the curves still wander. The best return any
 world model hit during training was −16.82, on a seed that finished at −26.06.
-And per environment step is not per unit of compute. A 384,000 step world model
-run took about 420 s here, the model-free one about 7 s.
+Also, counting per environment step isn't the same as counting compute. A 384,000
+step world model run took about 420 s here, and the model-free one took about 7 s.
 
 ![learning curves](results/learning-curves.png)
 
@@ -158,30 +158,30 @@ Longer version in [notes/METHODS.md](notes/METHODS.md#what-did-not-work).
 
 ## What the checks caught
 
-Two things were wrong. The random policy baseline was quoted as about −38
-everywhere, including the dashed line every learning curve is read against. It
-had never been measured on its own. Two independent reimplementations of the
-environment, 200,000 episodes each, give −36.87 and −36.85, so it is now
-−36.9, and the negative result got stronger: at 57,600
-environment steps every world model here sits below random.
+The checks found two mistakes. I had quoted the random policy baseline as about
+−38 everywhere, including the dashed line every learning curve is compared to. I'd
+never actually measured it by itself. Two separate reimplementations of the
+environment, 200,000 episodes each, give −36.87 and −36.85, so it's now −36.9.
+That made the negative result stronger, since at 57,600
+environment steps every world model here is below random.
 
-The second is smaller. The model-free row of the return table was labelled
-57,600 environment steps, but the model-free arm is only evaluated every ten
-iterations and its nearest evaluation is 48,960. The row says 48,960 now, and
-the README says what the next evaluation up gives, because picking the one below
-flatters the world models.
+The second one is smaller. I had labelled the model-free row of the return table
+57,600 environment steps. But the model-free arm is only evaluated every ten
+iterations, and its nearest evaluation is 48,960. The row says 48,960 now. I also
+mention what the next evaluation up gives, because only showing the one below
+makes the world models look better.
 
 ## What I got wrong
 
-I set the imagination horizon by copying a number, not by thinking about
-the task. Fifteen steps is standard in Dreamer papers on control suites with
-different timesteps. At dt=0.05 that is 0.75 seconds against a swing up that
-needs several, so the agent was being asked to plan over a window in which the
-correct action looks actively bad. Three debugging passes went by before I
+I picked the imagination horizon by copying a number instead of thinking about
+the task. Fifteen steps is standard in the Dreamer papers, but their control
+suites use different timesteps. At dt=0.05 that is 0.75 seconds, and a swing up
+takes several. So I was asking the agent to plan over a window where the right
+action actually looks bad. It took me three rounds of debugging before I
 converted 15 steps into seconds.
 
-I also skipped the target critic because DreamerV2 describes it as a
-stabilisation detail. Putting it back did not fix the oscillation either.
+I also left out the target critic because DreamerV2 describes it as a
+stabilisation detail. Putting it back didn't fix the oscillation either.
 
 Longer version in [notes/METHODS.md](notes/METHODS.md#what-i-got-wrong).
 
@@ -205,13 +205,13 @@ python -m bench.figures
 ```
 
 The sweep takes about ten minutes on an M4 CPU and writes `results/*.csv`. The
-three static figures read those files and never re-run an experiment. The
-animation is the one exception, because a drifting rollout is not something a
-summary file can hold: it retrains the seed 0 world model, which takes about a
-minute, and refuses to write itself unless its open loop error still matches the
-committed `open-loop.csv` exactly.
+three static figures only read those files and never re-run an experiment. The
+animation is different, because a summary file can't hold a drifting rollout. It
+retrains the seed 0 world model, which takes about a minute, and won't write
+itself unless its open loop error still matches the committed `open-loop.csv`
+exactly.
 
-[notes/FLAGS.md](notes/FLAGS.md) takes that command apart flag by flag and
+[notes/FLAGS.md](notes/FLAGS.md) goes through that command flag by flag and
 says what each arm cost.
 
 ## What is where
