@@ -27,7 +27,7 @@
  ],
  "no_model_free": false,
  "out": "out/main",
- "wall_clock_s": 4136.352070969,
+ "wall_clock_s": 3631.229855802,
  "torch": "2.13.0+cpu",
  "device": "cpu"
 }
