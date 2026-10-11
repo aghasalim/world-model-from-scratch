@@ -10,14 +10,14 @@ Long form detail moved out of the README.
 
 | method | return | range over seeds | env steps |
 |---|---:|---|---:|
-| recon (Dreamer style) | −40.76 | −42.2 to −32.9 | 57,600 |
-| no-recon (MuZero style) | −36.52 | −39.2 to −35.9 | 57,600 |
-| contrastive | −40.61 | −40.9 to −39.9 | 57,600 |
+| recon (Dreamer style) | −39.97 | −40.9 to −37.1 | 57,600 |
+| no-recon (MuZero style) | −36.89 | −39.8 to −31.1 | 57,600 |
+| contrastive | −40.62 | −40.9 to −34.8 | 57,600 |
 | model-free (recurrent PG) | −40.66 | −43.2 to −38.1 | 48,960 |
 | model-free, run out to 384,000 steps | −35.08 | −40.0 to −34.9 | 384,000 |
 
 A random policy scores about −36.9, measured over 200,000 episodes by
-`verify/pendulum`. At 57,600 steps the best world model, no-recon at −36.52, is
+`verify/pendulum`. At 57,600 steps the best world model, no-recon at −36.89, is
 level with it and nothing else clears it, so the sample efficiency result the
 repo was supposed to demonstrate does not reproduce. The
 model-free row is its nearest evaluation to that budget, at 48,960 steps; the
