@@ -20,7 +20,14 @@
  "eval_every": 5,
  "explore": 0.3,
  "kl_balance": 0.8,
- "wall_clock_s": 574.4863558330107,
- "torch": "2.13.0",
+ "modes": [
+  "recon (Dreamer style)",
+  "no-recon (MuZero style)",
+  "contrastive"
+ ],
+ "no_model_free": false,
+ "out": "out/main",
+ "wall_clock_s": 4136.352070969,
+ "torch": "2.13.0+cpu",
  "device": "cpu"
 }

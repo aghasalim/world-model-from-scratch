@@ -10,16 +10,19 @@ I built an RSSM from the Dreamer papers and trained an actor critic entirely in
 imagination. I also ran an ablation to see if a world model needs to reconstruct
 observations at all.
 
-Half of this worked. The world model learns, and I got a real answer on the
-representation question. The agent trained inside it didn't work at the budget I
-planned for. At 57,600 environment steps none of the world models beats a random
-policy. With the 384,000 steps the model-free baseline got, all three beat random
-and the baseline too. Still, none of them solves the task, and one run collapses.
+Half of this worked. The world model learns, and I got an answer on the
+representation question, though a smaller one than I first published. The agent
+trained inside it didn't work at the budget I planned for. At 57,600 environment
+steps the best world model is level with a random policy and the other two are
+below it. With the 384,000 steps the model-free baseline got, the recon and
+no-recon models beat random and the baseline on every seed, and the contrastive
+one doesn't. None of them solves the task.
 I kept the half that failed because of [`METHODOLOGY.md`](METHODOLOGY.md) rule 12,
 and that's a big part of why this README looks the way it does.
 
-I didn't use a GPU. The main sweep takes ten minutes on my laptop CPU, and the
-384,000 step runs take another 23 minutes. Every number published
+I didn't use a GPU. The published results come from a rerun on an old 4 core i5
+desktop, one thread per run. The main sweep took 69 minutes there, and the
+384,000 step runs took 2.2 hours alongside it. Every number published
 here is recomputed from the committed results by separate implementations in
 `verify/`, and CI fails if any of them disagree.
 
@@ -51,29 +54,30 @@ median over 3 seeds:
 
 | open loop step | recon (Dreamer) | no-recon (MuZero) | contrastive |
 |---:|---:|---:|---:|
-| 1 | **0.0403** | 0.0589 | 0.1058 |
-| 5 | **0.0577** | 0.0716 | 0.1034 |
-| 10 | 0.0966 | 0.0995 | 0.1849 |
-| 15 | 0.1635 | 0.1843 | 0.2799 |
-| 20 | 0.2230 | 0.3029 | 0.2954 |
-| 40 | 0.2910 | 0.2884 | 0.3648 |
+| 1 | 0.0381 | 0.0474 | 0.0886 |
+| 5 | 0.0615 | 0.0527 | 0.0836 |
+| 10 | 0.1254 | 0.1337 | 0.1587 |
+| 15 | 0.1703 | 0.2427 | 0.3262 |
+| 20 | 0.1817 | 0.2344 | 0.3818 |
+| 40 | 0.2261 | 0.3129 | 0.5745 |
 
-Reconstruction helps, and at short horizons it's clear. At one step the three
-reconstruction seeds are 0.0360, 0.0403 and 0.0439. The three no-recon seeds are
-0.0535, 0.0589 and 0.0889. Even the worst reconstruction seed beats the best
-no-recon seed, so the bands don't overlap. It's the same at k=5, with 0.0578
-worst against 0.0674 best.
+Reconstruction has the lower median at one step and from ten steps on, and
+no-recon has it in between. None of that holds up across seeds. At one step the
+three reconstruction seeds are 0.0367, 0.0381 and 0.0420. The three no-recon
+seeds are 0.0397, 0.0474 and 0.0797, so the best no-recon seed beats the worst
+reconstruction seed. At k=5 the medians swap and the bands still overlap, with
+0.0686 worst for recon against 0.0509 best for no-recon.
 
-By ten steps the advantage is gone. At k=10 recon spans 0.0699 to 0.1203 and
-no-recon spans 0.0853 to 0.1883, so they overlap. By k=40 the medians are 0.2910
-and 0.2884, which I can't tell apart. Recon has degraded to 7.2 times its one
-step error by then and no-recon to 4.9 times. No-recon started worse at one step, so
-it had less room to get worse.
+At k=10 recon spans 0.0770 to 0.1304 and no-recon spans 0.0954 to 0.1723, so
+they overlap. By k=40 the medians are 0.2261 and 0.3129, and the seeds overlap
+there too. Recon has degraded to 5.9 times its one step error by then and
+no-recon to 6.6 times.
 
-So reconstruction makes the model more accurate while it's still close to recent
-observations, and stops helping once the trajectory has drifted. That's a
-narrower claim than "Dreamer's decoder is worth it", but it's the one my
-experiment supports.
+Before I fixed the lambda returns, this table said reconstruction wins cleanly
+for five steps and then stops mattering. After the rerun that's gone. What's left
+is a lower median for reconstruction at most horizons, with no horizon where the
+seed bands come apart. With three seeds I can't say the decoder is worth it. The
+result that did hold up is the contrastive one below.
 
 ![imagined rollout against the true rollout](results/dream-vs-real.gif)
 
@@ -83,7 +87,7 @@ but loses the timing. This is the reconstruction model at seed 0, on the episode
 whose open loop error is the median of the 128 the numbers above are averaged
 over.
 
-Contrastive was the worst at every horizon, and that surprised me. Its InfoNCE
+Contrastive has the worst median at every horizon, and that surprised me. Its InfoNCE
 term only asks the latent to pick out which observation in the batch it belongs
 to. With a two dimensional observation on the unit circle that's an easy task,
 so the latent doesn't have to encode much. I'd guess it would do better with a
@@ -94,7 +98,7 @@ richer observation space.
 ![model fitting](results/model-fit.png)
 
 From the median first iteration loss to the median last one, reward prediction
-loss falls by 23 times for recon, 23 times for no-recon and 35 times for
+loss falls by 26 times for recon, 27 times for no-recon and 29 times for
 contrastive. The KL between posterior and prior goes up as the posterior starts
 carrying information, which is what I expected.
 
@@ -102,18 +106,18 @@ carrying information, which is what I expected.
 
 | method | return | range over seeds | env steps |
 |---|---:|---|---:|
-| recon (Dreamer style) | −38.13 | −40.9 to −36.8 | 57,600 |
-| no-recon (MuZero style) | −39.17 | −40.4 to −35.9 | 57,600 |
-| contrastive | −40.92 | −42.7 to −40.6 | 57,600 |
+| recon (Dreamer style) | −40.76 | −42.2 to −32.9 | 57,600 |
+| no-recon (MuZero style) | −36.52 | −39.2 to −35.9 | 57,600 |
+| contrastive | −40.61 | −40.9 to −39.9 | 57,600 |
 | model-free (recurrent PG) | −40.66 | −43.2 to −38.1 | 48,960 |
 | model-free, run out to 384,000 steps | −35.08 | −40.0 to −34.9 | 384,000 |
 
 A random policy scores about −36.9, measured over 200,000 episodes by
-`verify/pendulum`. That beats every world model in the table, so the sample
-efficiency result I set out to show doesn't reproduce. Put plainly, at 57,600 environment steps
-none of the three world models has learned anything useful. The best one, at
-−38.13, is below random. The model-free baseline at −40.66 is further below. The
-gap between those two is much smaller than the spread across three seeds.
+`verify/pendulum`. The best world model, no-recon at −36.52, is level with that,
+and the other two are below it. So the sample efficiency result I set out to show
+doesn't reproduce. Put plainly, at 57,600 environment steps none of the three
+world models has learned anything useful. No-recon is 0.4 above random and 4.1
+above the model-free baseline's −40.66, and its seed range overlaps both.
 
 The model-free arm is evaluated every ten iterations and never lands exactly on
 57,600 steps. Its row above is the nearest evaluation below that, at 48,960. The
@@ -122,8 +126,8 @@ model final here. Picking a different evaluation point moves the comparison more
 than picking a different method does, so it points to the same conclusion.
 
 When I ran that baseline out to 384,000 steps it reached −35.08. That's better
-than every final in the table above, and it's the only entry that beats a random
-policy at all. Tuning changed things without fixing them. Raising the imagination
+than every final in the table above. Tuning changed things without fixing them,
+in runs I did before the lambda return fix. Raising the imagination
 horizon from 15 to 40 took the best run from −40.1 to −30.1, and then the runs oscillate: one reaches −30.6 and falls back to −39.4.
 
 ### Given the same 384,000 steps
@@ -135,22 +139,25 @@ each one for 400 iterations, 384,000 steps, and left every other setting the sam
 
 | method, at 384,000 steps | seed 0 | seed 1 | seed 2 | median |
 |---|---:|---:|---:|---:|
-| recon (Dreamer style) | −28.54 | −30.81 | −31.75 | −30.81 |
-| no-recon (MuZero style) | −31.15 | −20.51 | −26.06 | −26.06 |
-| contrastive | −32.26 | −32.33 | −40.91 | −32.33 |
+| recon (Dreamer style) | −26.08 | −17.39 | −24.65 | −24.65 |
+| no-recon (MuZero style) | −30.79 | −31.10 | −27.42 | −30.79 |
+| contrastive | −35.17 | −39.33 | −40.91 | −39.33 |
 | model-free (recurrent PG) | −40.03 | −34.94 | −35.08 | −35.08 |
 
-With the same experience, every world model beats the random policy's −36.9 and
-the model-free baseline. The one exception is a contrastive run that goes flat at
-−40.91 by about 25,000 steps and never moves again. No-recon is best on two of three seeds and has the best
-single run, −20.51. So the sample efficiency result is real. It just needs more
-steps than the budget I originally planned for.
+With the same experience, recon and no-recon beat the random policy's −36.9 and
+the model-free baseline on every seed. Contrastive doesn't. One seed beats random,
+one ends at −39.33, and one goes flat at −40.91 by about 25,000 steps and never
+moves again. Recon is best on all three seeds and has the best single run, −17.39.
+So the sample efficiency result is real for two of the three models. It just needs
+more steps than the budget I originally planned for. Before the fix no-recon was
+the best one here, so I wouldn't claim which world model wins either.
 
 I still wouldn't call this a win, for two reasons. None of these returns comes
 close to holding the pendulum up, and the curves still wander. The best return any
-world model hit during training was −16.82, on a seed that finished at −26.06.
-Also, counting per environment step isn't the same as counting compute. A 384,000
-step world model run took about 420 s here, and the model-free one took about 7 s.
+world model hit during training was −15.94, on a seed that finished at −17.39.
+Also, counting per environment step isn't the same as counting compute. On the i5,
+one thread each, a 384,000 step world model run took 2,390 to 2,960 s, and the
+model-free one took about 45 s.
 
 ![learning curves](results/learning-curves.png)
 
@@ -163,7 +170,7 @@ The checks found two mistakes. I had quoted the random policy baseline as about
 never actually measured it by itself. Two separate reimplementations of the
 environment, 200,000 episodes each, give −36.87 and −36.85, so it's now −36.9.
 That made the negative result stronger, since at 57,600
-environment steps every world model here is below random.
+environment steps every world model in that run was below random.
 
 The second one is smaller. I had labelled the model-free row of the return table
 57,600 environment steps. But the model-free arm is only evaluated every ten
