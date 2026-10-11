@@ -4,8 +4,8 @@
 // results/, not claims written in words. Two of the claims written in words are
 // load bearing.
 //
-// The first is "reward prediction loss falls by 23 times for recon, 23 times for
-// no-recon and 35 times for contrastive", which is the whole evidence for the
+// The first is "reward prediction loss falls by 26 times for recon, 27 times for
+// no-recon and 29 times for contrastive", which is the whole evidence for the
 // half of the repository that did work.
 //
 // The second is the environment step budget the model-free baseline is compared

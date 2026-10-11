@@ -48,9 +48,9 @@ jobs:
           import pathlib
           p = pathlib.Path("results/open-loop.csv")
           s = p.read_bytes()
-          old = b"recon (Dreamer style),0.04025869071483612,0,1"
+          old = b"contrastive,0.08857814222574234,2,1"
           assert old in s, "the row the self test corrupts is no longer there"
-          p.write_bytes(s.replace(old, b"recon (Dreamer style),0.09025869071483612,0,1"))
+          p.write_bytes(s.replace(old, b"contrastive,0.09857814222574234,2,1"))
           PY
           if ./verify/verify.sh; then
             echo "verify.sh passed on a corrupted open-loop.csv, so it is checking nothing"

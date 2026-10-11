@@ -10,19 +10,22 @@ Long form detail moved out of the README.
 
 | method | return | range over seeds | env steps |
 |---|---:|---|---:|
-| recon (Dreamer style) | −38.13 | −40.9 to −36.8 | 57,600 |
-| no-recon (MuZero style) | −39.17 | −40.4 to −35.9 | 57,600 |
-| contrastive | −40.92 | −42.7 to −40.6 | 57,600 |
+| recon (Dreamer style) | −40.76 | −42.2 to −32.9 | 57,600 |
+| no-recon (MuZero style) | −36.52 | −39.2 to −35.9 | 57,600 |
+| contrastive | −40.61 | −40.9 to −39.9 | 57,600 |
 | model-free (recurrent PG) | −40.66 | −43.2 to −38.1 | 48,960 |
 | model-free, run out to 384,000 steps | −35.08 | −40.0 to −34.9 | 384,000 |
 
 A random policy scores about −36.9, measured over 200,000 episodes by
-`verify/pendulum`. Nothing here clears it at 57,600 steps, so the sample
-efficiency result the repo was supposed to demonstrate does not reproduce. The
+`verify/pendulum`. At 57,600 steps the best world model, no-recon at −36.52, is
+level with it and nothing else clears it, so the sample efficiency result the
+repo was supposed to demonstrate does not reproduce. The
 model-free row is its nearest evaluation to that budget, at 48,960 steps; the
 next one up, 58,560 steps, is −35.89.
 
-I tuned this rather than giving up on the first failure. The imagination horizon
+I tuned this rather than giving up on the first failure. The tuning below was
+done before the lambda return fix of 2026-10-10, so its numbers come from the old
+returns. The imagination horizon
 mattered most: at 15 steps, which is 0.75 seconds of simulated time, the policy
 cannot see the payoff of swinging back to build momentum, and raising it to 40
 took the best run from −40 to −30. I also added the slow moving target critic

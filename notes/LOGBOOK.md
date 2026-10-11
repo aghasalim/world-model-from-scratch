@@ -1,5 +1,15 @@
 # Logbook
 
+## 2026-10-11, the rerun after the lambda return fix
+**Tried:** reran both sweeps with the fixed returns, the README command for 60 iterations and the same command at 400 iterations with `--no-model-free`, one process per seed for the long runs. CPU torch 2.13.0 on a 4 core i5-7400T under WSL, one thread per process, four processes at once. The main sweep took 69 minutes and the long runs 2.2 hours. `bench/figures.py` was run on the same machine so the animation could match `open-loop.csv` exactly, and it did.
+**Measured:** at 57,600 steps the medians went from recon -38.13, no-recon -39.17, contrastive -40.92 to -40.76, -36.52 and -40.61. The model-free numbers came out identical to the last digit, which is a useful check that the machine change did not move anything by itself. Open loop reward MAE at k=1 went from 0.0403, 0.0589, 0.1058 to 0.0381, 0.0474, 0.0886, and at k=40 from 0.2910, 0.2884, 0.3648 to 0.2261, 0.3129, 0.5745. At 384,000 steps the medians went from recon -30.81, no-recon -26.06, contrastive -32.33 to -24.65, -30.79 and -39.33.
+**Concluded:** two published conclusions did not survive. The clean separation between recon and no-recon at k=1 and k=5 is gone: the seed bands now overlap at every horizon, and at k=5 no-recon has the lower median. And at 384,000 steps recon, not no-recon, is the best world model, while contrastive no longer beats random on two of its three seeds. What held: contrastive has the worst open loop median everywhere, nothing at 57,600 steps is clearly better than random, the same contrastive seed still goes flat at -40.91, and the model fits (reward loss falls 26 to 29 times). The R check now expects no horizon to separate, and the CI self test corrupts a contrastive row, because with these numbers every recon k=1 median is also a quoted seed value and corrupting that row could not fail.
+
+## 2026-10-10, the lambda return bootstrapped the last step from the wrong state
+**Tried:** checking `lambda_return` by hand at lam=0, where it should be one step TD.
+**Measured:** with rewards 1, 2, 3, values 10, 20, 30 and gamma 0.5 the last return came out 18, r plus gamma times the value of the same state. It should be 30, the value itself, because there is no next state to bootstrap from. The fix also changes the two older lambda tests, which had been written against the old behaviour.
+**Concluded:** every published training number came from the old code, so `results/` and the README tables need a full rerun (the 60 iteration sweep and the 400 iteration one) before this can be merged. I have not rerun them yet.
+
 ## 2026-09-13, the defaults did not reproduce the published run
 **Tried:** ran `python -m experiments.main` with no flags and compared against `results/run-meta.json`.
 **Measured:** four settings differed. `--iters` 40 against 60, `--imag-horizon` 15 against 40, `--actor-lr` 8e-5 against 1e-3, `--eval-every` 4 against 5. The README command carried all four overrides and the Go check held it to `run-meta.json`, so the published numbers were never in doubt, but the bare command produced a different experiment.

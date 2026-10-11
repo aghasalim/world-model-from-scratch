@@ -82,8 +82,9 @@ def test_buffer_round_trips_and_wraps():
 # --- lambda returns ---------------------------------------------------------
 def test_lambda_return_is_reward_to_go_when_undiscounted_and_lam_one():
     r = torch.ones(2, 5)
+    # The last step is the bootstrap v[T-1] = 0, so r[T-1] is not counted twice.
     got = lambda_return(r, torch.zeros(2, 5), gamma=1.0, lam=1.0)
-    assert torch.allclose(got[0], torch.tensor([5.0, 4.0, 3.0, 2.0, 1.0]), atol=1e-5)
+    assert torch.allclose(got[0], torch.tensor([4.0, 3.0, 2.0, 1.0, 0.0]), atol=1e-5)
 
 
 def test_lambda_return_is_one_step_td_when_lam_zero():
@@ -96,7 +97,16 @@ def test_lambda_return_is_one_step_td_when_lam_zero():
 def test_lambda_return_discounts():
     r = torch.ones(1, 3)
     a = lambda_return(r, torch.zeros(1, 3), gamma=0.5, lam=1.0)
-    assert abs(a[0, 0].item() - (1 + 0.5 + 0.25)) < 1e-5
+    assert abs(a[0, 0].item() - (1 + 0.5)) < 1e-5
+
+
+def test_lambda_return_last_step_bootstraps_from_its_own_value():
+    # lam=0 is one step TD everywhere: R_t = r_t + gamma * v_{t+1}. There is no
+    # v_T, so R_{T-1} must be v_{T-1}, not r_{T-1} + gamma * v_{T-1}.
+    r = torch.tensor([[1.0, 2.0, 3.0]])
+    v = torch.tensor([[10.0, 20.0, 30.0]])
+    got = lambda_return(r, v, gamma=0.5, lam=0.0)
+    assert torch.allclose(got[0], torch.tensor([11.0, 17.0, 30.0]), atol=1e-5)
 
 
 # --- rssm -------------------------------------------------------------------

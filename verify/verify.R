@@ -1,8 +1,9 @@
 # Exact inference on the claim the ablation is built on.
 #
-# The README argues from three seeds: at k=1 and k=5 the worst reconstruction
-# seed still beats the best no-recon seed, so the bands do not overlap, and by
-# k=10 they do. That is stated as an observation and never tested, and three
+# The README argues from three seeds. Before the lambda return fix it said the
+# bands separate at k=1 and k=5 and overlap from k=10. After the rerun it says
+# they overlap at every horizon in the table. That is stated as an observation
+# and never tested, and three
 # seeds against three is small enough that the reader deserves to know what the
 # strongest possible evidence at that size even is.
 #
@@ -23,7 +24,7 @@ root <- if (length(args) > 0) args[1] else "."
 RECON <- "recon (Dreamer style)"
 NORECON <- "no-recon (MuZero style)"
 HORIZONS <- c(1, 5, 10, 15, 20, 40)
-SEPARATED <- c(1, 5)          # the horizons the README claims do not overlap
+SEPARATED <- integer(0)       # the horizons the README claims do not overlap
 
 ol <- read.csv(file.path(root, "results", "open-loop.csv"),
                check.names = FALSE, stringsAsFactors = FALSE)
@@ -91,5 +92,5 @@ if (failures > 0) {
     cat(sprintf("\n%d checks failed\n", failures))
     quit(status = 1)
 }
-cat("\nR confirms the separation at k=1 and k=5, the overlap from k=10 on,\n")
+cat("\nR confirms the seeds overlap at every horizon the README quotes,\n")
 cat("and that complete separation is the most three seeds can show\n")
