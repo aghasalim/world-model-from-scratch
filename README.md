@@ -1,3 +1,5 @@
+<p align="center"><img src="assets/banner.jpg" alt="Line drawing of a pendulum and, in a thought cloud, the same pendulum with its imagined swing" width="100%"></p>
+
 # world-model-from-scratch
 
 [![ci](https://github.com/aghasalim/world-model-from-scratch/actions/workflows/ci.yml/badge.svg)](https://github.com/aghasalim/world-model-from-scratch/actions/workflows/ci.yml)
@@ -25,6 +27,23 @@ desktop, one thread per run. The main sweep took 61 minutes there, and the
 384,000 step runs took 2.1 hours alongside it. Every number published
 here is recomputed from the committed results by separate implementations in
 `verify/`, and CI fails if any of them disagree.
+
+<details>
+<summary>Contents</summary>
+
+- [The task](#the-task)
+- [The representation ablation](#the-representation-ablation)
+- [The model itself learns](#the-model-itself-learns)
+- [What did not work](#what-did-not-work)
+- [What the checks caught](#what-the-checks-caught)
+- [What I got wrong](#what-i-got-wrong)
+- [Running it](#running-it)
+- [What is where](#what-is-where)
+- [Reading](#reading)
+- [Citation](#citation)
+- [License](#license)
+
+</details>
 
 ## The task
 
@@ -248,6 +267,21 @@ tests/           22 tests
 - **Schrittwieser, Antonoglou, Hubert et al. Mastering Atari, Go, Chess and Shogi by Planning with a Learned Model. Nature 2020.** [arXiv:1911.08265](https://arxiv.org/abs/1911.08265) MuZero: the no-reconstruction position this ablation tests.
 - **Laskin, Srinivas, Abbeel. CURL: Contrastive Unsupervised Representations for Reinforcement Learning. ICML 2020.** [arXiv:2004.04136](https://arxiv.org/abs/2004.04136) The contrastive arm.
 - **Kaelbling, Littman, Cassandra. Planning and Acting in Partially Observable Stochastic Domains. AI 1998.** Why hiding velocity changes the problem, not just its difficulty.
+
+## Citation
+
+If you use this work, please cite it. The same record is in [`CITATION.cff`](CITATION.cff).
+
+```bibtex
+@software{mustafazada2026worldmodelfromscratch,
+  author  = {Mustafazada, Aghasalim},
+  title   = {World Models from scratch: RSSM and learning in imagination},
+  year    = {2026},
+  version = {1.0.1},
+  doi     = {10.5281/zenodo.23003689},
+  url     = {https://github.com/aghasalim/world-model-from-scratch}
+}
+```
 
 ## License
 
